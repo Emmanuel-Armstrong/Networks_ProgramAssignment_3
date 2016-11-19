@@ -1,0 +1,58 @@
+Created link Link Host_1-0 - Router_A-0
+Created link Link Router_A-1 - Router_B-0
+Created link Link Router_B-1 - Host_2-0
+Host_1: Starting
+Host_2: Starting
+Router_A: Starting
+Router_B: Starting
+Network: Starting
+Router_A: sending routing update "0000021,1/" from interface 1
+Link Host_1-0 - Router_A-0: transmitting packet "0000021,1/" on Router_A 0 -> Host_1, 0
+Host_1: sending packet "000021Sample client data 0"
+Host_1: received packet "0000021,1/"
+Link Router_A-1 - Router_B-0: transmitting packet "0000021,1/" on Router_A 1 -> Router_B, 0
+Link Host_1-0 - Router_A-0: transmitting packet "000021Sample client data 0" on Host_1 0 -> Router_A, 0
+Router_A: forwarding packet "000021Sample client data 0" from interface 0 to 1
+Link Router_A-1 - Router_B-0: transmitting packet "000021Sample client data 0" on Router_A 1 -> Router_B, 0
+Router_B: sending routing update "0000022,3/1,1/" from interface 0
+Router_B: Received routing update 0000021,1/ from interface 0
+Router_B: forwarding packet "000021Sample client data 0" from interface 0 to 1
+Link Router_A-1 - Router_B-0: transmitting packet "0000022,3/1,1/" on Router_B 0 -> Router_A, 1
+Router_A: sending routing update "0000021,1/1,1/" from interface 0
+Router_A: sending routing update "0000021,1/1,1/2,3/" from interface 0
+Link Router_B-1 - Host_2-0: transmitting packet "0000022,3/1,1/" on Router_B 1 -> Host_2, 0
+Router_A: Received routing update 0000022,3/1,1/ from interface 1
+Host_2: received packet "0000022,3/1,1/"
+Link Host_1-0 - Router_A-0: transmitting packet "0000021,1/1,1/" on Router_A 0 -> Host_1, 0
+Host_1: received packet "0000021,1/1,1/"
+Link Router_A-1 - Router_B-0: transmitting packet "0000021,1/1,1/" on Router_A 1 -> Router_B, 0
+Router_B: Received routing update 0000021,1/1,1/ from interface 0
+Link Router_B-1 - Host_2-0: transmitting packet "000021Sample client data 0" on Router_B 1 -> Host_2, 0
+Link Host_1-0 - Router_A-0: transmitting packet "0000021,1/1,1/2,3/" on Router_A 0 -> Host_1, 0
+Link Router_A-1 - Router_B-0: transmitting packet "0000021,1/1,1/2,3/" on Router_A 1 -> Router_B, 0
+Router_B: sending routing update "0000022,3/1,1/2,3/" from interface 0
+Host_2: received packet "000021Sample client data 0"
+Link Router_A-1 - Router_B-0: transmitting packet "0000022,3/1,1/2,3/" on Router_B 0 -> Router_A, 1
+Router_B: Received routing update 0000021,1/1,1/2,3/ from interface 0
+Host_1: received packet "0000021,1/1,1/2,3/"
+Router_A: Received routing update 0000022,3/1,1/2,3/ from interface 1
+Link Router_B-1 - Host_2-0: transmitting packet "0000022,3/1,1/2,3/" on Router_B 1 -> Host_2, 0
+Host_2: received packet "0000022,3/1,1/2,3/"
+Router_A: routing table
+       Cost to
+       1 1 2 
+From 0 1 - - 
+     1 - 1 3 
+
+Router_B: routing table
+       Cost to
+       2 1 2 
+From 0 - - - 
+     1 3 1 3 
+
+Network: Ending
+Host_2: Ending
+Router_A: Ending
+Router_B: Ending
+Host_1: Ending
+All simulation threads joined

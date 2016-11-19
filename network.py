@@ -181,9 +181,11 @@ class Router:
     #  @param i Incoming interface number for packet p
     def forward_packet(self, p, i):
         try:
-            # TODO: Here you will need to implement a lookup into the 
-            # forwarding table to find the appropriate outgoing interface
-            # for now we assume the outgoing interface is (i+1)%2
+            if(p.dst_addr in self.rt_tbl_D): #If destination is in the routing table, forward to the correct port
+                inner = self.rt_tbl_D[p.dst_addr]
+                interface = list(inner)[0]
+            else: #Destination is not in the routing table
+                interface = (i+1)%2
             self.intf_L[(i+1)%2].put(p.to_byte_S(), 'out', True)
             print('%s: forwarding packet "%s" from interface %d to %d' % (self, p, i, (i+1)%2))
         except queue.Full:
@@ -193,19 +195,55 @@ class Router:
     ## forward the packet according to the routing table
     #  @param p Packet containing routing information
     def update_routes(self, p, i):
-        #TODO: add logic to update the routing tables and
-        # possibly send out routing updates
+        inTable = self.msgToTable(str(p.data_S))
+        for key in inTable:
+            newCost = inTable[key]
+            if(key in self.rt_tbl_D):
+                inDict = self.rt_tbl_D[key] #Get values from the message
+                innerKey = list(inDict)[0]
+                temp = inDict.values()
+                curCost = list(temp)[0] #Current lowest cost in routing table
+                
+                if(i == 1): #If from interface 1, means from host 2
+                    if(2 in self.rt_tbl_D):
+                        inDict2 = self.rt_tbl_D[2]
+                        temp2 = inDict2.values()
+                        costTo = temp[0]
+                    else:
+                        costTo = 0
+                else: #If from interface 0, means from host 1
+                    if(1 in self.rt_tbl_D):
+                        inDict2 = self.rt_tbl_D[1]
+                        temp2 = inDict2.values()
+                        costTo = temp[0]
+                    else:
+                        costTo = 0
+                
+                
+                testCost = int(newCost) + int(costTo) #Add values to test
+                if(testCost < int(curCost)): #If new route is shorter, update table and send routes
+                    inDict[innerKey] = str(testCost)
+                    self.send_routes(0) #Send routes on all ports
+            else:
+                newDict = {} #Haven't seen the node before
+                newDict[1] = newCost
+                self.rt_tbl_D[key] = newDict #Add to routing table
+                self.send_routes(0) #Send routes on all ports
+            
+            
+            
+            
         print('%s: Received routing update %s from interface %d' % (self, p, i))
         
     ## send out route update
     # @param i Interface number on which to send out a routing update
     def send_routes(self, i):
-        # a sample route update packet
-        p = NetworkPacket(0, 'control', 'Sample routing table packet')
+        message = self.tableToMsg(self.rt_tbl_D) #Translate routing table to a string message
+        p = NetworkPacket(0, 'control', message)
         try:
-            #TODO: add logic to send out a route update
+            for interface in range(2): #Send routes on all interfaces
+                self.intf_L[interface].put(p.to_byte_S(), 'out', True)
             print('%s: sending routing update "%s" from interface %d' % (self, p, i))
-            self.intf_L[i].put(p.to_byte_S(), 'out', True)
         except queue.Full:
             print('%s: packet "%s" lost on interface %d' % (self, p, i))
             pass
@@ -240,3 +278,25 @@ class Router:
             if self.stop:
                 print (threading.currentThread().getName() + ': Ending')
                 return 
+    
+    #Translate a table to string message
+    def tableToMsg(self, rTable):
+        message = ''
+        for key in rTable:
+            message += str(str(key)+',') #Add the destination value
+            value = rTable[key]
+            innerKey = list(value)[0]
+            message += str(str(value[innerKey]) + '/') #Add the cost value
+        return message
+    
+    #Translate a message to a routing table
+    def msgToTable(self, message):
+        table = {}
+        list1 = message.split('/')
+        for pair in list1:
+            if(str(pair) != ''):
+                message = str(pair)
+                list2 = message.split(',') #Split the 2 values
+                table[str(list2[0])] = str(list2[1]) #Add values to the table
+        return table
+        
